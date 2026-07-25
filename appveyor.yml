@@ -1,6 +1,7 @@
 # Build Windows .exe no AppVeyor (gratis para repo publico)
-# Depois de conectar o projeto em https://ci.appveyor.com/projects/new
 # Artifacts → PresentePedro-windows.zip
+#
+# Importante: NAO use "build: off" — isso pula o build_script no AppVeyor.
 
 version: 1.0.{build}
 image: Visual Studio 2022
@@ -12,9 +13,6 @@ branches:
 
 environment:
   PYTHON: C:\Python312-x64\python.exe
-
-matrix:
-  fast_finish: true
 
 install:
   - ps: |
@@ -34,62 +32,32 @@ install:
       }
       if (-not $py) { throw "Python 3.12 x64 nao encontrado na imagem AppVeyor" }
       $env:PYTHON = $py
+      $scripts = Join-Path (Split-Path -Parent $py) "Scripts"
+      if (Test-Path $scripts) { $env:PATH = "$scripts;$env:PATH" }
+      # Persiste para os proximos steps do job
+      Add-AppveyorMessage "Python=$py"
+      [System.Environment]::SetEnvironmentVariable("PYTHON", $py, "Process")
       Write-Host "Python: $py"
       & $py --version
   - cmd: "%PYTHON% -m pip install --upgrade pip wheel setuptools"
-  # CPU wheel — suficiente para empacotar; no PC do Pedro usa CUDA se houver GPU
   - cmd: "%PYTHON% -m pip install torch"
   - cmd: "%PYTHON% -m pip install -r requirements.txt"
-  - cmd: "%PYTHON% -m pip install pyinstaller>=6.0"
+  - cmd: "%PYTHON% -m pip install ""pyinstaller>=6.0"""
 
+# build_script SEM "build: off" — senao o AppVeyor nao empacota e o artifact fica vazio
 build_script:
   - ps: |
-      $ErrorActionPreference = "Stop"
-      $FfmpegRoot = "packaging/windows/ffmpeg"
-      $FfmpegBin = Join-Path $FfmpegRoot "bin"
-      $Zip = Join-Path $env:TEMP "ffmpeg-release-essentials.zip"
-      $Url = "https://www.gyan.dev/ffmpeg/builds/ffmpeg-release-essentials.zip"
-      Write-Host "==> Baixando ffmpeg"
-      Invoke-WebRequest -Uri $Url -OutFile $Zip
-      $Extract = Join-Path $env:TEMP "ffmpeg-extract"
-      if (Test-Path $Extract) { Remove-Item -Recurse -Force $Extract }
-      Expand-Archive -Path $Zip -DestinationPath $Extract -Force
-      $Inner = Get-ChildItem $Extract -Directory | Select-Object -First 1
-      New-Item -ItemType Directory -Force -Path $FfmpegRoot | Out-Null
-      if (Test-Path $FfmpegBin) { Remove-Item -Recurse -Force $FfmpegBin }
-      Copy-Item -Recurse (Join-Path $Inner.FullName "bin") $FfmpegBin
-      if (-not (Test-Path (Join-Path $FfmpegBin "ffmpeg.exe"))) {
-        throw "ffmpeg.exe missing after download"
-      }
-
-      Write-Host "==> PyInstaller (pode demorar bastante)"
-      & $env:PYTHON -m PyInstaller --noconfirm --clean packaging/windows/PresentePedro.spec
-      $Out = "dist/PresentePedro"
-      if (-not (Test-Path "$Out/PresentePedro.exe")) { throw "PresentePedro.exe missing" }
-
-      $OutFfmpeg = Join-Path $Out "ffmpeg"
-      if (-not (Test-Path "$OutFfmpeg/bin/ffmpeg.exe")) {
-        Copy-Item -Recurse -Force "packaging/windows/ffmpeg" $OutFfmpeg
-      }
-      Copy-Item "GUIA-PARA-O-PEDRO.md" (Join-Path $Out "GUIA-PARA-O-PEDRO.md") -Force
-      Set-Content -Path (Join-Path $Out "LEIA-ME.txt") -Encoding UTF8 -Value @(
-        "Presente do Victor Prudencio para O Pedro",
-        "1) Extraia este zip",
-        "2) Abra PresentePedro.exe",
-        "3) Leia GUIA-PARA-O-PEDRO.md",
-        "Tudo roda LOCAL no PC (modelo no dispositivo)."
-      )
-
-      Write-Host "==> Zip"
-      if (Test-Path "PresentePedro-windows.zip") { Remove-Item "PresentePedro-windows.zip" -Force }
-      Compress-Archive -Path "dist/PresentePedro\*" -DestinationPath "PresentePedro-windows.zip" -Force
-      Get-Item "PresentePedro-windows.zip" | Format-List Name, Length
+      $env:PYTHON = if (Test-Path "C:\Python312-x64\python.exe") { "C:\Python312-x64\python.exe" } else { $env:PYTHON }
+      $scripts = Join-Path (Split-Path -Parent $env:PYTHON) "Scripts"
+      if (Test-Path $scripts) { $env:PATH = "$scripts;$env:PATH" }
+      Write-Host "==> Iniciando packaging/windows/build-ci.ps1"
+      & powershell -NoProfile -ExecutionPolicy Bypass -File "packaging\windows\build-ci.ps1"
+      if ($LASTEXITCODE -ne 0) { throw "build-ci.ps1 failed: $LASTEXITCODE" }
+      if (-not (Test-Path "PresentePedro-windows.zip")) { throw "PresentePedro-windows.zip nao foi gerado" }
 
 artifacts:
   - path: PresentePedro-windows.zip
     name: PresentePedro-windows
 
-# Build em push na main + rebuild manual no site
-build: off
 test: off
 deploy: off
