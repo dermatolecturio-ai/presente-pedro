@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Presente do Victor Prudencio para O Pedro</title>
+    <meta
+      name="description"
+      content="Presente do Victor Prudencio para O Pedro — transcrição local de vídeos por link ou arquivo, com carinho."
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700&family=Sora:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/static/styles.css" />
+  </head>
+  <body>
+    <div class="atmosphere" aria-hidden="true"></div>
+    <div class="grain" aria-hidden="true"></div>
+
+    <main class="shell">
+      <header class="brand-block">
+        <figure class="homage">
+          <img
+            src="/static/img/pedro.png"
+            alt="Retrato de Pedro — homenagem"
+            width="720"
+            height="720"
+            class="homage-photo"
+          />
+          <figcaption class="homage-caption">Para o Pedro</figcaption>
+        </figure>
+        <p class="brand">Presente do Victor Prudencio para O Pedro</p>
+        <h1 class="headline">Um link ou um arquivo. Um texto só seu.</h1>
+        <p class="lede">
+          Feito com carinho por Victor — pipeline local de transcrição, ao vivo,
+          com exportações e histórico. Em homenagem a você, Pedro.
+        </p>
+      </header>
+
+      <form id="form" class="composer" autocomplete="off">
+        <div
+          class="source-switch"
+          role="tablist"
+          aria-label="Fonte da mídia"
+        >
+          <button
+            type="button"
+            class="source-tab is-active"
+            role="tab"
+            id="tab-link"
+            aria-selected="true"
+            aria-controls="panel-link"
+            data-source="link"
+          >
+            Link
+          </button>
+          <button
+            type="button"
+            class="source-tab"
+            role="tab"
+            id="tab-file"
+            aria-selected="false"
+            aria-controls="panel-file"
+            data-source="file"
+          >
+            Arquivo
+          </button>
+        </div>
+
+        <div
+          id="panel-link"
+          class="source-panel"
+          role="tabpanel"
+          aria-labelledby="tab-link"
+        >
+          <label class="field">
+            <span class="field-label">URL do vídeo</span>
+            <input
+              id="url"
+              name="url"
+              type="url"
+              spellcheck="false"
+              placeholder="YouTube, Vimeo, outros sites… https://"
+            />
+          </label>
+        </div>
+
+        <div
+          id="panel-file"
+          class="source-panel"
+          role="tabpanel"
+          aria-labelledby="tab-file"
+          hidden
+        >
+          <div
+            id="dropzone"
+            class="dropzone"
+            tabindex="0"
+            role="button"
+            aria-controls="file-input"
+            aria-label="Selecionar ou soltar arquivo de áudio ou vídeo"
+          >
+            <input
+              id="file-input"
+              class="file-input"
+              type="file"
+              name="file"
+              accept=".mp3,.wav,.m4a,.aac,.flac,.ogg,.opus,.mp4,.mov,.mkv,.webm,.avi,.mpeg,.mpg,audio/*,video/*"
+            />
+            <p class="dropzone-title">Arraste áudio ou vídeo aqui</p>
+            <p class="dropzone-hint">
+              ou <span class="dropzone-browse">escolha um arquivo</span>
+              · mp3, wav, m4a, mp4, mov, webm…
+            </p>
+            <p id="file-meta" class="file-meta" hidden></p>
+          </div>
+        </div>
+
+        <div class="composer-row">
+          <label class="field field-lang">
+            <span class="field-label">Idioma</span>
+            <select id="language" name="language">
+              <option value="pt-BR">Português (Brasil)</option>
+              <option value="auto">Detectar automaticamente</option>
+              <option value="en-US">English (US)</option>
+              <option value="es-ES">Español</option>
+              <option value="fr-FR">Français</option>
+              <option value="de-DE">Deutsch</option>
+              <option value="it-IT">Italiano</option>
+              <option value="pt-PT">Português (Portugal)</option>
+            </select>
+          </label>
+
+          <label id="preview-field" class="field field-check">
+            <span class="field-label">Opções</span>
+            <span class="check-line">
+              <input id="opt-preview" type="checkbox" checked />
+              Prévia do vídeo
+            </span>
+          </label>
+
+          <button id="submit" type="submit" class="cta">
+            <span class="cta-label">Transcrever</span>
+            <span class="cta-pulse" aria-hidden="true"></span>
+          </button>
+        </div>
+        <p class="hint-keys">Atalho: <kbd>⌘</kbd>/<kbd>Ctrl</kbd> + <kbd>Enter</kbd></p>
+      </form>
+
+      <section id="preview" class="preview" hidden>
+        <div id="preview-frame" class="preview-frame"></div>
+      </section>
+
+      <section id="pipeline" class="pipeline" hidden aria-live="polite">
+        <header class="pipeline-head">
+          <h2 class="pipeline-title">Pipeline</h2>
+          <p id="pipeline-overall" class="pipeline-overall">0%</p>
+        </header>
+        <ol id="agent-rail" class="agent-rail"></ol>
+      </section>
+
+      <section id="live" class="live" hidden aria-live="polite">
+        <header class="live-head">
+          <h2 class="live-title">Ao vivo</h2>
+          <span id="live-badge" class="live-badge">escutando</span>
+        </header>
+        <article id="live-transcript" class="live-transcript"></article>
+      </section>
+
+      <section id="result" class="result" hidden>
+        <div class="result-meta">
+          <h2 id="result-title" class="result-title"></h2>
+          <p id="result-sub" class="result-sub"></p>
+        </div>
+
+        <div id="stats" class="stats" hidden></div>
+
+        <div class="toolbar">
+          <label class="search-field">
+            <span class="sr-only">Buscar no texto</span>
+            <input id="search" type="search" placeholder="Buscar no texto…" />
+          </label>
+          <div class="toolbar-group">
+            <button type="button" id="font-down" class="ghost tiny" title="Diminuir fonte">A−</button>
+            <button type="button" id="font-up" class="ghost tiny" title="Aumentar fonte">A+</button>
+            <button type="button" id="toggle-edit" class="ghost tiny">Editar</button>
+            <button type="button" id="toggle-fav" class="ghost tiny">★ Favoritar</button>
+          </div>
+        </div>
+
+        <article id="transcript" class="transcript" contenteditable="false"></article>
+        <div id="search-hits" class="search-hits" hidden></div>
+
+        <details id="segments-wrap" class="segments-wrap" hidden>
+          <summary class="segments-summary">
+            Segmentos com timestamps
+            <span id="segments-count" class="segments-count"></span>
+          </summary>
+          <ol id="segments-list" class="segments-list"></ol>
+        </details>
+
+        <div class="result-actions">
+          <button type="button" id="copy" class="ghost">Copiar texto</button>
+          <button type="button" id="copy-ts" class="ghost">Copiar c/ tempo</button>
+          <button type="button" id="open-yt" class="ghost">Abrir link</button>
+          <button type="button" id="print-btn" class="ghost">Imprimir</button>
+        </div>
+
+        <div class="export-row">
+          <span class="field-label">Exportar</span>
+          <button type="button" class="ghost tiny export-btn" data-fmt="txt">.txt</button>
+          <button type="button" class="ghost tiny export-btn" data-fmt="md">.md</button>
+          <button type="button" class="ghost tiny export-btn" data-fmt="srt">.srt</button>
+          <button type="button" class="ghost tiny export-btn" data-fmt="vtt">.vtt</button>
+          <button type="button" class="ghost tiny export-btn" data-fmt="json">.json</button>
+        </div>
+      </section>
+
+      <section id="history" class="history">
+        <header class="history-head">
+          <h2 class="history-title">Histórico local</h2>
+          <button type="button" id="clear-history" class="ghost tiny">Limpar</button>
+        </header>
+        <ul id="history-list" class="history-list"></ul>
+        <p id="history-empty" class="history-empty">Nenhuma transcrição salva ainda.</p>
+      </section>
+
+      <footer class="dedication">
+        <img
+          src="/static/img/pedro.png"
+          alt=""
+          class="dedication-thumb"
+          width="64"
+          height="64"
+        />
+        <div>
+          <p class="dedication-title">Homenagem</p>
+          <p class="dedication-text">
+            Este sistema é um presente do <strong>Victor Prudencio</strong> para
+            <strong>O Pedro</strong> — para transformar vídeos em palavras, no seu Mac,
+            do seu jeito.
+          </p>
+        </div>
+      </footer>
+
+      <p id="device-hint" class="device-hint"></p>
+    </main>
+
+    <script src="/static/app.js" defer></script>
+  </body>
+</html>

@@ -1,0 +1,22 @@
+.venv/
+.venv-win-build/
+__pycache__/
+*.py[cod]
+*.egg-info/
+.DS_Store
+.env
+data/
+tmp/
+*.wav
+*.webm
+*.m4a
+*.mp3
+.cache/
+huggingface/
+*.log
+
+# packaging / build artifacts
+packaging/windows/ffmpeg/bin/
+dist/
+build/
+*.spec.bak
