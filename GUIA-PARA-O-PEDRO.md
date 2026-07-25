@@ -8,12 +8,17 @@ Este programa transcreve vídeo/áudio **no seu computador**. Nada de nuvem de I
 
 ## 1. Instalar (uma vez)
 
-1. Victor te manda uma pasta chamada **`PresentePedro`** (zip ou pendrive).
-2. Extraia o zip (se vier zipado) para um lugar fácil, por exemplo:
+1. Victor te manda um **zip** (ou pendrive).
+2. Extraia para um lugar fácil, por exemplo:
    - `Área de Trabalho\PresentePedro`
-3. Abra a pasta. Você deve ver o arquivo:
-   - **`PresentePedro.exe`**
-4. Dê **dois cliques** em `PresentePedro.exe`.
+3. Abra a pasta e dê **dois cliques** em um destes (o que existir):
+   - **`PresentePedro.exe`** — abre direto  
+   - **`Abrir-PresentePedro.bat`** — na primeira vez pede internet e instala o que falta (pode demorar)
+
+### Se for o `.bat` e pedir Python
+
+Instale Python 3.12+ em https://www.python.org/downloads/  
+Marque **Add python.exe to PATH**, depois rode o `.bat` de novo.
 
 ### Se o Windows assustar (SmartScreen)
 

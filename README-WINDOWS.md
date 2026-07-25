@@ -28,6 +28,23 @@ Na **primeira execução** o Windows baixa o modelo do Hugging Face (~1–2 GB
 | Disco | ~4–8 GB livres (modelo + deps) |
 | Rede | Só na 1ª vez (modelo) e para baixar vídeos por link |
 
+## Como gerar o `.exe` pelo Mac (AppVeyor — grátis)
+
+O GitHub Actions desta conta pode estar bloqueado por billing. Alternativa gratuita com VM Windows:
+
+1. Suba o repo (público) no GitHub com o arquivo [`appveyor.yml`](appveyor.yml)
+2. Crie conta em [ci.appveyor.com](https://ci.appveyor.com) → **Login with GitHub**
+3. **New Project** → autorize → escolha `presente-pedro`
+4. Espere o build (PyTorch + PyInstaller: 30–90+ min)
+5. Em **Artifacts**, baixe `PresentePedro-windows.zip`
+
+No Mac, depois do build verde:
+
+```bash
+export APPVEYOR_TOKEN=seu_token   # https://ci.appveyor.com/api-token
+./scripts/download-appveyor-artifact.sh
+```
+
 ## Como gerar o `.exe` (máquina Windows de build)
 
 1. Instale [Python 3.12+](https://www.python.org/downloads/) (marque **Add python.exe to PATH**)

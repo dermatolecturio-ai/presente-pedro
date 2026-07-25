@@ -44,7 +44,15 @@ for i in $(seq 1 90); do
   if [[ "$STATE" == "completed" ]]; then
     if [[ "$CONCL" != "success" ]]; then
       echo "Build falhou ($CONCL). Veja: $(gh run view "$RUN_ID" --json url --jq .url)" >&2
-      gh run view "$RUN_ID" --log-failed | tail -n 80 || true
+      VIEW="$(gh run view "$RUN_ID" 2>&1 || true)"
+      echo "$VIEW" | head -n 40 >&2
+      if echo "$VIEW" | grep -qi 'billing issue\|account is locked\|spending limit'; then
+        echo "" >&2
+        echo "Conta GitHub com billing locked — Actions nao sobe o job Windows." >&2
+        echo "Desbloqueie em: https://github.com/settings/billing" >&2
+        echo "Fallback sem Actions: ./scripts/package-windows-from-mac.sh" >&2
+      fi
+      gh run view "$RUN_ID" --log-failed 2>/dev/null | tail -n 80 || true
       exit 1
     fi
     break
