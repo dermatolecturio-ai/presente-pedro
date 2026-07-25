@@ -1,5 +1,5 @@
 # Build Windows .exe no AppVeyor (gratis para repo publico)
-# Artifacts → PresentePedro-windows.zip
+# Artifacts -> PresentePedro-windows.zip
 #
 # Importante: NAO use "build: off" — isso pula o build_script no AppVeyor.
 
@@ -12,15 +12,15 @@ branches:
     - main
 
 environment:
-  PYTHON: C:\Python312-x64\python.exe
+  PYTHON: C:/Python312-x64/python.exe
 
 install:
   - ps: |
       $candidates = @(
         $env:PYTHON,
-        "C:\Python312-x64\python.exe",
-        "C:\Python312\python.exe",
-        "C:\Python311-x64\python.exe"
+        'C:\Python312-x64\python.exe',
+        'C:\Python312\python.exe',
+        'C:\Python311-x64\python.exe'
       )
       $py = $null
       foreach ($c in $candidates) {
@@ -30,30 +30,31 @@ install:
         $cmd = Get-Command python -ErrorAction SilentlyContinue
         if ($cmd) { $py = $cmd.Source }
       }
-      if (-not $py) { throw "Python 3.12 x64 nao encontrado na imagem AppVeyor" }
+      if (-not $py) { throw 'Python 3.12 x64 nao encontrado na imagem AppVeyor' }
       $env:PYTHON = $py
-      $scripts = Join-Path (Split-Path -Parent $py) "Scripts"
+      $scripts = Join-Path (Split-Path -Parent $py) 'Scripts'
       if (Test-Path $scripts) { $env:PATH = "$scripts;$env:PATH" }
-      # Persiste para os proximos steps do job
       Add-AppveyorMessage "Python=$py"
-      [System.Environment]::SetEnvironmentVariable("PYTHON", $py, "Process")
       Write-Host "Python: $py"
       & $py --version
-  - cmd: "%PYTHON% -m pip install --upgrade pip wheel setuptools"
-  - cmd: "%PYTHON% -m pip install torch"
-  - cmd: "%PYTHON% -m pip install -r requirements.txt"
-  - cmd: "%PYTHON% -m pip install ""pyinstaller>=6.0"""
+  - cmd: '%PYTHON% -m pip install --upgrade pip wheel setuptools'
+  - cmd: '%PYTHON% -m pip install torch'
+  - cmd: '%PYTHON% -m pip install -r requirements.txt'
+  - cmd: '%PYTHON% -m pip install pyinstaller'
 
-# build_script SEM "build: off" — senao o AppVeyor nao empacota e o artifact fica vazio
 build_script:
   - ps: |
-      $env:PYTHON = if (Test-Path "C:\Python312-x64\python.exe") { "C:\Python312-x64\python.exe" } else { $env:PYTHON }
-      $scripts = Join-Path (Split-Path -Parent $env:PYTHON) "Scripts"
+      if (Test-Path 'C:\Python312-x64\python.exe') {
+        $env:PYTHON = 'C:\Python312-x64\python.exe'
+      }
+      $scripts = Join-Path (Split-Path -Parent $env:PYTHON) 'Scripts'
       if (Test-Path $scripts) { $env:PATH = "$scripts;$env:PATH" }
-      Write-Host "==> Iniciando packaging/windows/build-ci.ps1"
-      & powershell -NoProfile -ExecutionPolicy Bypass -File "packaging\windows\build-ci.ps1"
+      Write-Host '==> Iniciando packaging/windows/build-ci.ps1'
+      & powershell -NoProfile -ExecutionPolicy Bypass -File 'packaging\windows\build-ci.ps1'
       if ($LASTEXITCODE -ne 0) { throw "build-ci.ps1 failed: $LASTEXITCODE" }
-      if (-not (Test-Path "PresentePedro-windows.zip")) { throw "PresentePedro-windows.zip nao foi gerado" }
+      if (-not (Test-Path 'PresentePedro-windows.zip')) {
+        throw 'PresentePedro-windows.zip nao foi gerado'
+      }
 
 artifacts:
   - path: PresentePedro-windows.zip
